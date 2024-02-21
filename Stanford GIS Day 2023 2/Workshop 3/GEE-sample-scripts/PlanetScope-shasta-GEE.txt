@@ -1,0 +1,139 @@
+// /* In this workshop, you will be introduced to image processing in Google
+// Earth Engine.
+
+// Google Earth Engine is a cloud-based platform that enables large-scale 
+// processing of imagery to detect changes, map trends, and quantify 
+// differences on the Earth’s surface.
+
+// This workshop will focus on mapping changes in surface area levels over
+// Shasta Lake this past year using 3-meter resolution PlanetScope imagery.
+
+
+// TIP: Use "command-/" to uncomment chunks of code for the workshop
+// */
+
+// /* SECTION 1: Create and display a Geometry over Shasta Lake ////////////////* 
+// /* Define the region of interest (ROI) - Shasta Lake*/
+// var shasta_lake = ee.Geometry.Polygon(
+//         [[[-122.48691050204125,40.7049384269217],
+//           [-122.11474863680688,40.7049384269217],
+//           [-122.11474863680688,40.898294348395034],
+//           [-122.48691050204125,40.898294348395034],
+//           [-122.48691050204125,40.7049384269217]]]);
+
+// /* Add Shasta Lake to the map */
+// Map.addLayer(shasta_lake, {width: 2, fillOpacity: 0}, 'Shasta Lake Geometry');
+// Map.centerObject(shasta_lake, 10);
+
+
+
+
+
+// /*SECTION 2: Load PlanetScope Imagery ///////////////////////////////////////*
+
+// /* Load Planet Collection filter by date*/
+// var ps_collection = ee.ImageCollection(
+//   'YOUR_COLLECTION_NAME_HERE')
+//   .filter(ee.Filter.lt('cloud_percent', 10))
+//   //.filterBounds(shasta_lake);
+// print(ps_collection.first());
+
+// /* Plot RGB PS Collection */
+// var rgbVis = {
+//   min: 0,
+//   max: 2000,
+//   bands: ['B6', 'B4', 'B2'],
+// };
+// Map.addLayer(ps_collection.median(), rgbVis, 'Planetscope RGB');
+
+// /* SECTION 3: Filter Dates and Plot Monthly Medians /////////////////////////*
+// /* According to NOAA, Shasta Lake experienced heavy rainfall in December
+// 2022 and January of 2023 this past season.  Let's check on the water levels
+// before and after this event.*/
+
+// var Nov_2022 = ps_collection.filterDate('2022-11-01', '2022-11-15')
+// var Feb_2023 = ps_collection.filterDate('2023-02-01', '2023-02-15')
+
+// Map.addLayer(Nov_2022.median().clip(shasta_lake), rgbVis, 'RGB Nov 2022');
+// Map.addLayer(Feb_2023.median().clip(shasta_lake), rgbVis, 'RGB Feb 2023');
+
+
+
+
+
+
+// /* SECTION 4: Map NDWI //////////////////////////////////////////////////////*
+
+// /* Can we use a spectral index to identify water pixels?
+// Calculate Normalized Difference Water Index (NDWI)*/
+// var calculateNDWI = function(image) {
+//   var ndwi = image.normalizedDifference(['B4', 'B8']).rename('NDWI');
+//   return image.addBands(ndwi);
+// };
+
+// /* Apply the NDWI function to the collection, when printing note
+// the new NDWI band */
+// var Nov_2022 = Nov_2022.map(calculateNDWI);
+// var Feb_2023 = Feb_2023.map(calculateNDWI);
+// print(Nov_2022.first())
+
+// /* Define visualization parameters for NDWI */
+// var ndwiVis = {
+//     min: -1,
+//     max: 1,
+//     palette: ['white', 'darkblue']
+// };
+
+// /* Save NDWI as variables */
+// var Nov_ndwi = Nov_2022.select("NDWI").median().clip(shasta_lake);
+// var Feb_ndwi = Feb_2023.select("NDWI").median().clip(shasta_lake);
+
+// Map.addLayer(Nov_ndwi, ndwiVis, 'NDWI Nov 2022');
+// Map.addLayer(Feb_ndwi, ndwiVis, 'NDWI Feb 2023');
+
+
+
+
+
+// /* SECTION 5:  Classify Water Pixels ///////////////////////////////////////*
+
+// /* Let's establish a threshold above which values are "water" */
+// print(ui.Chart.image.histogram({image: Nov_ndwi, scale: 100}));
+// print(ui.Chart.image.histogram({image: Feb_ndwi, scale: 100}));
+
+// /* The histogram displays two major distributions, the higher of which
+// is composed of values over the reservoir*/
+// var threshold = 0
+
+// /* Classify water in both images by creating binary masks for each image
+// based on the threshold*/
+// var Nov_water = Nov_ndwi.gt(threshold); // Greater than threshold -> True, otherwise False
+// var Feb_water = Feb_ndwi.gt(threshold);
+
+// Map.addLayer(Nov_water, {}, 'water Nov 2022');
+// Map.addLayer(Feb_water, {}, 'water Feb 2023');
+
+
+
+
+
+
+// /* SECTION 6: Map Pixels that are Newly Aqueous ////////////////////////////*
+
+// /*Compute the difference between the two masks*/
+// var maskDifference = Feb_water.subtract(Nov_water);
+
+// /*Display the masks */
+// Map.addLayer(maskDifference, {min: -1, max: 1, palette: ['grey', 'white']}, 'Mask Difference');
+
+// /*Calculate the total area of the maskDifference*/
+// var area = maskDifference.reduceRegion({
+//   reducer: ee.Reducer.sum(),
+//   geometry: shasta_lake,
+//   scale: 10, // meters
+// });
+// print("Total area in m2 of surface area change: ", area);
+
+
+// /* Workshop Complete */
+

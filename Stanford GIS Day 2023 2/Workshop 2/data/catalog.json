@@ -1,0 +1,13 @@
+{
+  "type": "Catalog",
+  "id": "906c00b0-f426-4377-9e77-ad751ff3c9ef",
+  "stac_version": "1.0.0",
+  "description": "lake lag 2023",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json"
+    }
+  ]
+}

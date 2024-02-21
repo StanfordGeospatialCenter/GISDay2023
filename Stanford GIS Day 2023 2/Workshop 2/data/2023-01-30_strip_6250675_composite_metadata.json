@@ -1,0 +1,58 @@
+{
+    "geometry": {
+        "coordinates": [
+            [
+                [
+                    -122.182855,
+                    37.417424
+                ],
+                [
+                    -122.182855,
+                    37.426557
+                ],
+                [
+                    -122.168133,
+                    37.426557
+                ],
+                [
+                    -122.168133,
+                    37.417424
+                ],
+                [
+                    -122.182855,
+                    37.417424
+                ]
+            ]
+        ],
+        "type": "Polygon"
+    },
+    "properties": {
+        "acquired": "2023-01-30T17:55:40.449181Z",
+        "anomalous_pixels": 0.0,
+        "clear_confidence_percent": 98,
+        "clear_percent": 100,
+        "cloud_cover": 0.0,
+        "cloud_percent": 0,
+        "ground_control": true,
+        "gsd": 3.8,
+        "heavy_haze_percent": 0,
+        "instrument": "PSB.SD",
+        "item_type": "PSScene",
+        "light_haze_percent": 0,
+        "pixel_resolution": 3.0,
+        "publishing_stage": "finalized",
+        "quality_category": "standard",
+        "satellite_azimuth": 104.7,
+        "satellite_id": "2465",
+        "shadow_percent": 0,
+        "snow_ice_percent": 0,
+        "strip_id": "6250675",
+        "sun_azimuth": 141.4,
+        "sun_elevation": 25.3,
+        "updated": "2023-10-13T22:21:45Z",
+        "view_angle": 1.3,
+        "visible_confidence_percent": 98,
+        "visible_percent": 100
+    },
+    "type": "Feature"
+}
